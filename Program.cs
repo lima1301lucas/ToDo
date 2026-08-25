@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using ToDo.Data;
+using ToDo.Interfaces;
+using ToDo.Models;
+using ToDo.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,12 @@ builder.Services.AddSwaggerGen();
 
 var connectionString = builder.Configuration.GetConnectionString("AppDbConnectionString");
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
+builder.Services.AddScoped<ILeituraRepository<Categoria>, LeituraRepository<Categoria>>();
+builder.Services.AddScoped<ILeituraRepository<Prioridade>, LeituraRepository<Prioridade>>();
+builder.Services.AddScoped<ILeituraRepository<Status>, LeituraRepository<Status>>();
 
 var app = builder.Build();
 
