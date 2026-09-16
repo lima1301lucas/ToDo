@@ -1,8 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using ToDo.Data;
 using ToDo.Interfaces;
 using ToDo.Models;
 using ToDo.Repositories;
+using ToDo.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +23,36 @@ builder.Services.AddScoped<ILeituraRepository<Categoria>, LeituraRepository<Cate
 builder.Services.AddScoped<ILeituraRepository<Prioridade>, LeituraRepository<Prioridade>>();
 builder.Services.AddScoped<ILeituraRepository<Status>, LeituraRepository<Status>>();
 
+builder.Services.AddScoped<IUsuarioService, UsuarioService>();
+builder.Services.AddScoped<ITarefaService, TarefaService>();
+builder.Services.AddScoped<ILeituraService<Categoria>, LeituraService<Categoria>>();
+builder.Services.AddScoped<ILeituraService<Prioridade>, LeituraService<Prioridade>>();
+builder.Services.AddScoped<ILeituraService<Status>, LeituraService<Status>>();
+
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtIssuer,
+
+            ValidateAudience = true,
+            ValidAudience = jwtAudience,
+
+            ValidateLifetime = true,
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -28,6 +62,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

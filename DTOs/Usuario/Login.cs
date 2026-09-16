@@ -6,5 +6,9 @@
             string Identificador,
             string Senha
         );
+        public record LoginResponseDto(
+            string Token,
+            DateTime Expiracao
+        );
     }
 }
