@@ -4,6 +4,7 @@ using static ToDo.DTOs.Tarefa.Update;
 using static ToDo.DTOs.Tarefa.Response;
 using ToDo.Interfaces;
 using ToDo.Models;
+using ToDo.Exceptions;
 
 namespace ToDo.Services
 {
@@ -44,7 +45,7 @@ namespace ToDo.Services
 
             if (tarefa == null)
             {
-                throw new Exception("Tarefa não encontrada");
+                throw new RecursoNaoEncontradoException("Tarefa não encontrada");
             }
 
             tarefa.Titulo = dto.Titulo;
@@ -67,7 +68,7 @@ namespace ToDo.Services
 
             if (tarefa == null)
             {
-                throw new Exception("Tarefa não encontrada");
+                throw new RecursoNaoEncontradoException("Tarefa não encontrada");
             }
 
             return MapToResponseDto(tarefa);
@@ -86,7 +87,7 @@ namespace ToDo.Services
 
             if (tarefa == null)
             {
-                throw new Exception("Tarefa não encontrada");
+                throw new RecursoNaoEncontradoException("Tarefa não encontrada");
             }
 
             await _tarefaRepository.DeleteAsync(tarefa);

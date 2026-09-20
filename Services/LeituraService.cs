@@ -1,6 +1,6 @@
-﻿using ToDo.DTOs.Compartilhado;
-using static ToDo.DTOs.Compartilhado.Response;
+﻿using static ToDo.DTOs.Compartilhado.Response;
 using ToDo.Interfaces;
+using ToDo.Exceptions;
 
 namespace ToDo.Services
 {
@@ -28,7 +28,7 @@ namespace ToDo.Services
 
             if (item == null)
             {
-                throw new Exception("Item não encontrado");
+                throw new RecursoNaoEncontradoException("Item não encontrado");
             }
 
             return new ItemListaResponseDto(item.Id, item.Nome);
