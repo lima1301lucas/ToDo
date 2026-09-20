@@ -9,6 +9,7 @@ using static ToDo.DTOs.Usuario.Login;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ToDo.Exceptions;
 
 namespace ToDo.Services
 {
@@ -34,7 +35,7 @@ namespace ToDo.Services
             var existe = await _usuarioRepository.ExisteEmailOuUsernameAsync(dto.Email, dto.Username);
             if (existe)
             {
-                throw new Exception("Email ou username já cadastrado.");
+                throw new ConflitoException("Email ou username já cadastrado.");
             }
 
             var senhaHash = BCrypt.Net.BCrypt.HashPassword(dto.Senha);
@@ -66,7 +67,7 @@ namespace ToDo.Services
 
             if (usuario == null)
             {
-                throw new Exception("Usuário não existe");
+                throw new RecursoNaoEncontradoException("Usuário não existe");
             }
 
             usuario.PrimeiroNome = dto.PrimeiroNome;
@@ -91,7 +92,7 @@ namespace ToDo.Services
 
             if (usuario == null)
             {
-                throw new Exception("Usuário não existe");
+                throw new RecursoNaoEncontradoException("Usuário não existe");
             }
 
             return new UsuarioResponseDto(
@@ -109,14 +110,14 @@ namespace ToDo.Services
 
             if (usuario == null)
             {
-                throw new Exception("Usuário não existe");
+                throw new RecursoNaoEncontradoException("Usuário não existe");
             }
 
             var senhaAtualCorreta = BCrypt.Net.BCrypt.Verify(dto.SenhaAtual, usuario.SenhaHash);
 
             if (!senhaAtualCorreta)
             {
-                throw new Exception("Senha atual incorreta");
+                throw new NaoAutorizadoException("Senha atual incorreta");
             }
 
             usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(dto.SenhaNova);
@@ -137,7 +138,7 @@ namespace ToDo.Services
 
             if (usuario == null)
             {
-                throw new Exception("Usuário não existe");
+                throw new RecursoNaoEncontradoException("Usuário não existe");
             }
 
             await _usuarioRepository.DeleteAsync(usuario);
@@ -149,14 +150,14 @@ namespace ToDo.Services
 
             if (usuario == null || !usuario.Ativo)
             {
-                throw new Exception("Usuário ou senha inválidos");
+                throw new NaoAutorizadoException("Usuário ou senha inválidos");
             }
 
             var senhaCorreta = BCrypt.Net.BCrypt.Verify(dto.Senha, usuario.SenhaHash);
 
             if (!senhaCorreta)
             {
-                throw new Exception("Usuário ou senha inválidos");
+                throw new NaoAutorizadoException("Usuário ou senha inválidos");
             }
 
             var claims = new List<Claim>

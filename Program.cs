@@ -7,6 +7,7 @@ using ToDo.Interfaces;
 using ToDo.Models;
 using ToDo.Repositories;
 using ToDo.Services;
+using ToDo.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +55,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseMiddleware<TratamentoDeErrosMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
